@@ -2,6 +2,7 @@ from django.test import TestCase
 from medtrackerapp.models import Medication, DoseLog
 from django.utils import timezone
 from datetime import timedelta
+from unittest.mock import patch
 
 
 class MedicationModelTests(TestCase):
@@ -67,6 +68,13 @@ class MedicationModelTests(TestCase):
         end = start - timedelta(days=1)
         with self.assertRaises(ValueError):
             med.adherence_rate_over_period(start, end)
+
+    @patch("medtrackerapp.services.DrugInfoService.get_drug_info")
+    def test_fetch_external_info_failure(self, mock_get_info):
+        mock_get_info.side_effect = Exception("API Error")
+        med = Medication.objects.create(name="TestMed", dosage_mg=10, prescribed_per_day=1)
+        result = med.fetch_external_info()
+        self.assertEqual(result, {"error": "API Error"})
 
 
 class DoseLogModelTests(TestCase):
