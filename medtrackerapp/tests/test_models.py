@@ -53,13 +53,9 @@ class MedicationModelTests(TestCase):
         start_date = timezone.now().date() - timedelta(days=2)
         end_date = timezone.now().date()
         
-        # 3 days period (start, start+1, end). Expected doses = 3 * 1 = 3.
-        # Log 1: Taken inside period
         DoseLog.objects.create(medication=med, taken_at=timezone.now() - timedelta(days=1), was_taken=True)
-        # Log 2: Missed inside period
         DoseLog.objects.create(medication=med, taken_at=timezone.now() - timedelta(days=2), was_taken=False)
         
-        # 1 taken out of 3 expected = 33.33%
         self.assertEqual(med.adherence_rate_over_period(start_date, end_date), 33.33)
 
     def test_adherence_rate_over_period_invalid_dates(self):
