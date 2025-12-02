@@ -87,6 +87,5 @@ class DoseLogModelTests(TestCase):
         med = Medication.objects.create(name="Aspirin", dosage_mg=100, prescribed_per_day=2)
         taken_at = timezone.now()
         log = DoseLog.objects.create(medication=med, taken_at=taken_at, was_taken=False)
-        
         expected_str = f"Aspirin at {timezone.localtime(taken_at).strftime('%Y-%m-%d %H:%M')} - Missed"
         self.assertEqual(str(log), expected_str)
