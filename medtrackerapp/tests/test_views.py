@@ -66,6 +66,35 @@ class MedicationViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_502_BAD_GATEWAY)
         self.assertIn("error", response.data)
 
+    def test_expected_doses_valid(self):
+        url = reverse("medication-expected-doses", args=[self.med.id])
+        response = self.client.get(url, {"days": 5})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["medication_id"], self.med.id)
+        self.assertEqual(response.data["days"], 5)
+        self.assertEqual(response.data["expected_doses"], 10)  # 5 days * 2 per day
+
+    def test_expected_doses_missing_parameter(self):
+        url = reverse("medication-expected-doses", args=[self.med.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_expected_doses_invalid_parameter_non_integer(self):
+        url = reverse("medication-expected-doses", args=[self.med.id])
+        response = self.client.get(url, {"days": "invalid"})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_expected_doses_invalid_parameter_negative(self):
+        url = reverse("medication-expected-doses", args=[self.med.id])
+        response = self.client.get(url, {"days": -1})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_expected_doses_invalid_parameter_zero(self):
+        url = reverse("medication-expected-doses", args=[self.med.id])
+        response = self.client.get(url, {"days": 0})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["expected_doses"], 0)
+
 
 class DoseLogViewTests(APITestCase):
     def setUp(self):

@@ -127,3 +127,24 @@ class DoseLog(models.Model):
         status = "Taken" if self.was_taken else "Missed"
         when = timezone.localtime(self.taken_at).strftime("%Y-%m-%d %H:%M")
         return f"{self.medication.name} at {when} - {status}"
+
+
+class Note(models.Model):
+    """
+    Stores a note associated with a medication.
+
+    Each Note contains text and is linked to a specific Medication.
+    The created_at timestamp is automatically set when the note is created.
+    """
+    
+    medication = models.ForeignKey(Medication, on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """Metadata options for the Note model."""
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        """Return a human-readable description of the note."""
+        return f"Note for {self.medication.name}: {self.text}"
