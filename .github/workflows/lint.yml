@@ -25,10 +25,8 @@ jobs:
 
       - name: Ruff linting check
         run: |
-          source venv/bin/activate
-          ruff check . --show-fixes --output-format=github
+          ./venv/bin/ruff check . --show-fixes --output-format=github
 
       - name: Ruff formatting check
         run: |
-          source venv/bin/activate
-          ruff format --check --diff .
+          ./venv/bin/ruff format --check --diff .
