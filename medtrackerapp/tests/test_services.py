@@ -4,8 +4,7 @@ from medtrackerapp.services import DrugInfoService
 
 
 class DrugInfoServiceTests(TestCase):
-
-    @patch('medtrackerapp.services.requests.get')
+    @patch("medtrackerapp.services.requests.get")
     def test_get_drug_info_success(self, mock_get):
         # Configure the mock to return a successful response
         mock_response = Mock()
@@ -15,10 +14,10 @@ class DrugInfoServiceTests(TestCase):
                 {
                     "openfda": {
                         "generic_name": ["ASPIRIN"],
-                        "manufacturer_name": ["Bayer"]
+                        "manufacturer_name": ["Bayer"],
                     },
                     "warnings": ["Do not take if allergic."],
-                    "purpose": ["Pain reliever"]
+                    "purpose": ["Pain reliever"],
                 }
             ]
         }
@@ -32,14 +31,16 @@ class DrugInfoServiceTests(TestCase):
         self.assertEqual(result["manufacturer"], "Bayer")
         self.assertEqual(result["warnings"], ["Do not take if allergic."])
         self.assertEqual(result["purpose"], ["Pain reliever"])
-        
+
         # Verify requests.get was called with correct parameters
         mock_get.assert_called_once()
         args, kwargs = mock_get.call_args
         self.assertEqual(args[0], DrugInfoService.BASE_URL)
-        self.assertEqual(kwargs["params"], {"search": "openfda.generic_name:aspirin", "limit": 1})
+        self.assertEqual(
+            kwargs["params"], {"search": "openfda.generic_name:aspirin", "limit": 1}
+        )
 
-    @patch('medtrackerapp.services.requests.get')
+    @patch("medtrackerapp.services.requests.get")
     def test_get_drug_info_api_error(self, mock_get):
         # Configure the mock to return a 500 error
         mock_response = Mock()
@@ -49,10 +50,10 @@ class DrugInfoServiceTests(TestCase):
         # Assert that ValueError is raised
         with self.assertRaises(ValueError) as context:
             DrugInfoService.get_drug_info("aspirin")
-        
+
         self.assertIn("OpenFDA API error: 500", str(context.exception))
 
-    @patch('medtrackerapp.services.requests.get')
+    @patch("medtrackerapp.services.requests.get")
     def test_get_drug_info_no_results(self, mock_get):
         # Configure the mock to return empty results
         mock_response = Mock()
@@ -63,7 +64,7 @@ class DrugInfoServiceTests(TestCase):
         # Assert that ValueError is raised
         with self.assertRaises(ValueError) as context:
             DrugInfoService.get_drug_info("unknown_drug")
-            
+
         self.assertIn("No results found", str(context.exception))
 
     def test_get_drug_info_empty_name(self):

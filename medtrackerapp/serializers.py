@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Medication, DoseLog, Note
 
+
 class MedicationSerializer(serializers.ModelSerializer):
     adherence = serializers.SerializerMethodField()
 

@@ -3,9 +3,10 @@ from medtrackerapp.models import Medication, Note
 
 
 class NoteModelTests(TestCase):
-
     def setUp(self):
-        self.med = Medication.objects.create(name="Aspirin", dosage_mg=100, prescribed_per_day=2)
+        self.med = Medication.objects.create(
+            name="Aspirin", dosage_mg=100, prescribed_per_day=2
+        )
 
     def test_create_note(self):
         note = Note.objects.create(medication=self.med, text="Take with food")
