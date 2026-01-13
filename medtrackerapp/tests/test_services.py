@@ -1,7 +1,7 @@
 from django.test import TestCase
 from unittest.mock import patch, Mock
 from medtrackerapp.services import DrugInfoService
-import requests
+
 
 class DrugInfoServiceTests(TestCase):
 

@@ -1,6 +1,5 @@
 from django.test import TestCase
 from medtrackerapp.models import Medication, Note
-from django.utils import timezone
 
 
 class NoteModelTests(TestCase):
