@@ -9,7 +9,9 @@ from datetime import timedelta
 
 class MedicationViewTests(APITestCase):
     def setUp(self):
-        self.med = Medication.objects.create(name="Aspirin", dosage_mg=100, prescribed_per_day=2)
+        self.med = Medication.objects.create(
+            name="Aspirin", dosage_mg=100, prescribed_per_day=2
+        )
 
     def test_list_medications_valid_data(self):
         url = reverse("medication-list")
@@ -98,14 +100,16 @@ class MedicationViewTests(APITestCase):
 
 class DoseLogViewTests(APITestCase):
     def setUp(self):
-        self.med = Medication.objects.create(name="Test Med", dosage_mg=50, prescribed_per_day=1)
+        self.med = Medication.objects.create(
+            name="Test Med", dosage_mg=50, prescribed_per_day=1
+        )
         self.log_url = reverse("doselog-list")
 
     def test_create_log_valid(self):
         data = {
             "medication": self.med.id,
             "taken_at": timezone.now(),
-            "was_taken": True
+            "was_taken": True,
         }
         response = self.client.post(self.log_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -115,7 +119,7 @@ class DoseLogViewTests(APITestCase):
         data = {
             "medication": 999,  # Non-existent ID
             "taken_at": timezone.now(),
-            "was_taken": True
+            "was_taken": True,
         }
         response = self.client.post(self.log_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -132,7 +136,7 @@ class DoseLogViewTests(APITestCase):
         start = (now - timedelta(days=3)).date()
         end = now.date()
         response = self.client.get(url, {"start": start, "end": end})
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 

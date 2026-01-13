@@ -6,6 +6,7 @@ from django.utils.dateparse import parse_date
 from .models import Medication, DoseLog, Note
 from .serializers import MedicationSerializer, DoseLogSerializer, NoteSerializer
 
+
 class MedicationViewSet(viewsets.ModelViewSet):
     """
     API endpoint for viewing and managing medications.
@@ -22,6 +23,7 @@ class MedicationViewSet(viewsets.ModelViewSet):
         - DELETE /medications/{id}/ — delete a medication
         - GET /medications/{id}/info/ — fetch external drug info from OpenFDA
     """
+
     queryset = Medication.objects.all()
     serializer_class = MedicationSerializer
 
@@ -69,36 +71,31 @@ class MedicationViewSet(viewsets.ModelViewSet):
             GET /medications/1/expected-doses/?days=5
         """
         days_param = request.query_params.get("days")
-        
+
         if not days_param:
             return Response(
                 {"error": "The 'days' query parameter is required."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         try:
             days = int(days_param)
         except ValueError:
             return Response(
                 {"error": "The 'days' parameter must be a valid integer."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         medication = self.get_object()
-        
+
         try:
             expected = medication.expected_doses(days)
         except ValueError as e:
-            return Response(
-                {"error": str(e)},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        return Response({
-            "medication_id": medication.id,
-            "days": days,
-            "expected_doses": expected
-        })
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(
+            {"medication_id": medication.id, "days": days, "expected_doses": expected}
+        )
 
 
 class DoseLogViewSet(viewsets.ModelViewSet):
@@ -118,6 +115,7 @@ class DoseLogViewSet(viewsets.ModelViewSet):
         - GET /logs/filter/?start=YYYY-MM-DD&end=YYYY-MM-DD —
           filter logs within a date range
     """
+
     queryset = DoseLog.objects.all()
     serializer_class = DoseLogSerializer
 
@@ -142,9 +140,11 @@ class DoseLogViewSet(viewsets.ModelViewSet):
         end_param = request.query_params.get("end")
 
         if not start_param or not end_param:
-             return Response(
-                {"error": "Both 'start' and 'end' query parameters are required and must be valid dates."},
-                status=status.HTTP_400_BAD_REQUEST
+            return Response(
+                {
+                    "error": "Both 'start' and 'end' query parameters are required and must be valid dates."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         start = parse_date(start_param)
@@ -152,14 +152,17 @@ class DoseLogViewSet(viewsets.ModelViewSet):
 
         if not start or not end:
             return Response(
-                {"error": "Both 'start' and 'end' query parameters are required and must be valid dates."},
-                status=status.HTTP_400_BAD_REQUEST
+                {
+                    "error": "Both 'start' and 'end' query parameters are required and must be valid dates."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        logs = self.get_queryset().filter(
-            taken_at__date__gte=start,
-            taken_at__date__lte=end
-        ).order_by("taken_at")
+        logs = (
+            self.get_queryset()
+            .filter(taken_at__date__gte=start, taken_at__date__lte=end)
+            .order_by("taken_at")
+        )
 
         serializer = self.get_serializer(logs, many=True)
         return Response(serializer.data)
@@ -179,8 +182,9 @@ class NoteViewSet(viewsets.ModelViewSet):
         - GET /notes/{id}/ — retrieve a specific note
         - DELETE /notes/{id}/ — delete a note
     """
+
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
-    http_method_names = ['get', 'post', 'delete', 'head', 'options']
+    http_method_names = ["get", "post", "delete", "head", "options"]
     filter_backends = (SearchFilter,)
-    search_fields = ['medication__name']
+    search_fields = ["medication__name"]

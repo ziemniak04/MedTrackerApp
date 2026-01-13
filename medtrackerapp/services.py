@@ -1,5 +1,6 @@
 import requests
 
+
 class DrugInfoService:
     """
     Wrapper around the OpenFDA Drug Label API.
@@ -53,7 +54,7 @@ class DrugInfoService:
                 "purpose": ["Pain reliever/fever reducer"]
             }
         """
-        
+
         if not drug_name:
             raise ValueError("drug_name is required")
 
@@ -72,8 +73,12 @@ class DrugInfoService:
         openfda = record.get("openfda", {})
 
         return {
-            "name": openfda.get("generic_name", [drug_name])[0] if isinstance(openfda.get("generic_name"), list) else openfda.get("generic_name", drug_name),
-            "manufacturer": openfda.get("manufacturer_name", ["Unknown"])[0] if isinstance(openfda.get("manufacturer_name"), list) else openfda.get("manufacturer_name", "Unknown"),
+            "name": openfda.get("generic_name", [drug_name])[0]
+            if isinstance(openfda.get("generic_name"), list)
+            else openfda.get("generic_name", drug_name),
+            "manufacturer": openfda.get("manufacturer_name", ["Unknown"])[0]
+            if isinstance(openfda.get("manufacturer_name"), list)
+            else openfda.get("manufacturer_name", "Unknown"),
             "warnings": record.get("warnings", ["No warnings available"]),
             "purpose": record.get("purpose", ["Not specified"]),
         }
